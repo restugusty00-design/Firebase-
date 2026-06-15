@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Smart Home Dashboard</title>
+    <!-- Import styles dan icon font -->
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ==================== HALAMAN LOGIN ==================== -->
+    <div id="auth-view" class="view-section active">
+        <div class="auth-card neon-box">
+            <div class="auth-header text-center">
+                <i class="fa-solid fa-microchip glow-icon-blue main-logo"></i>
+                <h1 class="glow-text-blue">SMART HOME IoT</h1>
+                <p>Silakan login untuk mengakses sistem</p>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fa-solid fa-envelope"></i> Email</label>
+                <input type="email" id="login-email" placeholder="contoh@kampus.ac.id">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fa-solid fa-lock"></i> Password</label>
+                <input type="password" id="login-pass" placeholder="••••••••">
+            </div>
+            
+            <button id="btn-login" class="btn btn-primary w-full">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
+            
+            <div class="divider">
+                <span>ATAU</span>
+            </div>
+            
+            <button id="btn-google" class="btn btn-google w-full">
+                <i class="fa-brands fa-google"></i> Login dengan Google
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ==================== DASHBOARD UTAMA ==================== -->
+    <div id="dashboard-view" class="view-section hidden">
+        
+        <!-- Navbar Sub-system -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fa-solid fa-house-signal glow-icon-blue"></i>
+                <span class="glow-text-blue fw-bold">SMART HOME COMMAND CENTER</span>
+            </div>
+            <div class="nav-metrics">
+                <!-- Digital Clock Widget -->
+                <div class="clock-widget neon-border-sm">
+                    <i class="fa-regular fa-clock"></i> <span id="realtime-clock">--:--:--</span>
+                </div>
+                <!-- Indikator Koneksi Firebase -->
+                <div class="status-widget neon-border-sm" id="connection-widget">
+                    <div class="status-dot online"></div>
+                    <span id="connection-text">Online</span>
+                </div>
+                <button id="btn-emergency" class="btn btn-emergency btn-sm" onclick="emergencyShutdown()">
+                    <i class="fa-solid fa-triangle-exclamation"></i> SHUTDOWN
+                </button>
+                <button id="btn-logout" class="btn btn-outline-danger btn-sm">
+                    <i class="fa-solid fa-power-off"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <div class="dashboard-grid">
+            
+            <!-- PANEL: SENSOR METER -->
+            <div class="section-panel">
+                <h2 class="panel-title"><i class="fa-solid fa-satellite-dish"></i> Sensor Lingkungan</h2>
+                <div class="sensor-grid">
+                    
+                    <!-- Kartu Suhu -->
+                    <div class="sensor-card temp-card neon-box">
+                        <div class="sensor-icon pulse-red">
+                            <i class="fa-solid fa-temperature-half"></i>
+                        </div>
+                        <div class="sensor-data">
+                            <h3>Suhu (Temperature)</h3>
+                            <div class="data-value glow-text-red">
+                                <span id="val-temp">--</span><span>°C</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kartu Kelembaban -->
+                    <div class="sensor-card humid-card neon-box">
+                        <div class="sensor-icon pulse-blue">
+                            <i class="fa-solid fa-droplet"></i>
+                        </div>
+                        <div class="sensor-data">
+                            <h3>Kelembaban (Humidity)</h3>
+                            <div class="data-value glow-text-blue">
+                                <span id="val-humidity">--</span><span>%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- GRAFIK HISTORI RECHARTS -->
+                <div class="chart-module neon-box" style="margin-top: 1.5rem;">
+                    <h3 class="panel-title" style="margin-bottom: 1rem;"><i class="fa-solid fa-chart-line"></i> Trend Sensor Realtime</h3>
+                    <div id="recharts-container" style="height: 300px; width: 100%; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.2);"></div>
+                </div>
+
+            </div>
+
+            <!-- PANEL: KONTROL RELAY (4 Channel) -->
+            <div class="section-panel">
+                <h2 class="panel-title"><i class="fa-solid fa-server"></i> Kontrol Perangkat (Relay)</h2>
+                <div class="relay-grid">
+                    
+                    <!-- Relay 1 -->
+                    <div class="relay-card neon-box" id="card-relay1">
+                        <div class="relay-header">
+                            <i class="fa-solid fa-lightbulb relay-icon" id="icon-relay1"></i>
+                            <span class="relay-title">Lampu 1</span>
+                            <span class="relay-status badge-off" id="status-relay1">OFF</span>
+                        </div>
+                        <div class="relay-controls">
+                            <button class="btn btn-success btn-sm w-half" onclick="setRelay('relay1', 1)">ON</button>
+                            <button class="btn btn-danger btn-sm w-half" onclick="setRelay('relay1', 0)">OFF</button>
+                        </div>
+                    </div>
+
+                    <!-- Relay 2 -->
+                    <div class="relay-card neon-box" id="card-relay2">
+                        <div class="relay-header">
+                            <i class="fa-solid fa-lightbulb relay-icon" id="icon-relay2"></i>
+                            <span class="relay-title">Lampu 2</span>
+                            <span class="relay-status badge-off" id="status-relay2">OFF</span>
+                        </div>
+                        <div class="relay-controls">
+                            <button class="btn btn-success btn-sm w-half" onclick="setRelay('relay2', 1)">ON</button>
+                            <button class="btn btn-danger btn-sm w-half" onclick="setRelay('relay2', 0)">OFF</button>
+                        </div>
+                    </div>
+
+                    <!-- Relay 3 -->
+                    <div class="relay-card neon-box" id="card-relay3">
+                        <div class="relay-header">
+                            <i class="fa-solid fa-lightbulb relay-icon" id="icon-relay3"></i>
+                            <span class="relay-title">Lampu 3</span>
+                            <span class="relay-status badge-off" id="status-relay3">OFF</span>
+                        </div>
+                        <div class="relay-controls">
+                            <button class="btn btn-success btn-sm w-half" onclick="setRelay('relay3', 1)">ON</button>
+                            <button class="btn btn-danger btn-sm w-half" onclick="setRelay('relay3', 0)">OFF</button>
+                        </div>
+                    </div>
+
+                    <!-- Relay 4 -->
+                    <div class="relay-card neon-box" id="card-relay4">
+                        <div class="relay-header">
+                            <i class="fa-solid fa-lightbulb relay-icon" id="icon-relay4"></i>
+                            <span class="relay-title">Lampu 4</span>
+                            <span class="relay-status badge-off" id="status-relay4">OFF</span>
+                        </div>
+                        <div class="relay-controls">
+                            <button class="btn btn-success btn-sm w-half" onclick="setRelay('relay4', 1)">ON</button>
+                            <button class="btn btn-danger btn-sm w-half" onclick="setRelay('relay4', 0)">OFF</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Kontrol Pola (Pattern Control) -->
+                <h3 class="panel-subtitle mt-4 mb-3"><i class="fa-solid fa-layer-group"></i> Kontrol Pola (Pattern Mode)</h3>
+                <div class="pattern-grid">
+                    <button class="btn btn-outline-primary" onclick="setPola(1)">
+                        <i class="fa-solid fa-xmarks-lines"></i> Pola Silang Berulang
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="setPola(2)">
+                        <i class="fa-solid fa-shuffle"></i> Pola Bebas Berulang
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="hentikanPola()">
+                        <i class="fa-solid fa-stop"></i> Hentikan Pola
+                    </button>
+                </div>
+            </div>
+
+            <!-- PANEL: VOICE COMMAND & TERMINAL LOG -->
+            <div class="bottom-grid">
+                
+                <!-- Voice Command Module -->
+                <div class="voice-module neon-box">
+                    <h2 class="panel-title"><i class="fa-solid fa-microphone-lines"></i> AI Voice Command</h2>
+                    <p class="text-muted text-sm mb-3">Tekan mic untuk memberi perintah suara (Cth: "Nyalakan lampu 1").</p>
+                    
+                    <div class="voice-sandbox">
+                        <button id="btn-voice" class="btn-circular">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+                        <div class="voice-result-box">
+                            <span class="text-muted" id="voice-transcript">Menunggu perintah suara...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal Logger Module -->
+                <div class="log-module neon-box">
+                    <h2 class="panel-title"><i class="fa-solid fa-terminal"></i> System Activity Log</h2>
+                    <div class="terminal-container" id="terminal-log">
+                        <!-- Logs akan dimasukkan secara dinamis via JS -->
+                        <div class="log-line text-muted">[System] Engine initialized...</div>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Menjalankan logika aplikasinya -->
+    <script type="module" src="/script.js"></script>
+</body>
+</html>

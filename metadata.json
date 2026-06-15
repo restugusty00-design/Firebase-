@@ -1,0 +1,10 @@
+{
+  "name": "Smart Home IoT",
+  "description": "Dashboard Smart Home Futuristic dengan Voice Command dan Firebase Realtime Database",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
